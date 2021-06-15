@@ -2,22 +2,43 @@
 # $target exists
 _unecible() {
 	#### manage targets ####
-
 	if [ -z "$target" ]; then
 		msgerror "No target ?!"
 		return 1
 	fi
 
-	(
-		local cmd="$1";shift
-		! ${unecible_verbose:-false} || echo >&2 "## --- unecible($target) exec($cmd)[$#]: $*"
-		. ./"$cmd"
-	)
+	case "$1" in
+	(ssh)	(
+			REQUIRE via__ssh
+			! ${unecible_verbose:-false} || echo >&2 "## --- unecible($target) ssh[$#]: $*"
+			shift;via__ssh "$target" "$@"
+		)
+	;;
+	(eval) 	(
+			shift
+			! ${unecible_verbose:-false} || echo >&2 "## --- unecible($target) eval[$#]: $*"
+			eval "$@"
+		)
+	;;
+	(*)	(
+			local cmd="$1";shift
+			! ${unecible_verbose:-false} || echo >&2 "## --- unecible($target) exec($cmd)[$#]: $*"
+			. ./"$cmd"
+		)
+	;;
+	esac
 	return $?
 }
 
 unecible_help() {
-	echo "Usage: unecible <target> <path/to/task/script.sh> [<args...>]"
+	echo 'Usage: unecible <target> [options] ssh|eval|<path> [<args...>]'
+	echo '       unecible <target> path/to/script.sh   [<args...>]'
+	echo '       unecible <target> ssh|eval            [<args...>]'
+	echo 'Options:'
+	echo '   -p <text>|--prefix <text>'
+	echo '   --no-bootstrap'
+	echo '   -v|--verbose'
+	echo '   -q|--quiet'
 }
 
 unecible() {
@@ -35,11 +56,9 @@ unecible() {
 		(-q|--quiet) unecible_verbose=false;;
 		(-v|--verbose) unecible_verbose=true;;
 		(-p|--prefix) unecible_use_prefix="$2";shift;;
-		(--no-p|--no-prefix) unecible_use_prefix=false;;
 		(--no-bootstrap) unecible_remote_bootstrap='';;
 		(--) shift;break;;
 		(-*) echo >&2 "ERROR: unecible: Invalid option $1"; return 1;;
-		#(exec) break;;
 		(*) break
 		esac
 		shift

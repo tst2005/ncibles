@@ -1,6 +1,4 @@
 
-#REQUIRE unecible
-
 # usefull to check valid/invalid hostname
 REQUIRE via__ssh__hostname_with_ssh_options
 hostname_with_ssh_options() { via__ssh__hostname_with_ssh_options "$@"; }
@@ -89,7 +87,6 @@ ncibles_exec1() {
 
 ncibles() {
 	local TARGETS=''
-	local BOOTSTRAP='remote.stdin/bootstrap'
 	local allow_invalid_host=false
 	local opt_ssh_use_master=true
 	local opt_ssh_interactive=false
@@ -103,11 +100,10 @@ ncibles() {
 		;;
 		(-v|--verbose) opt_quiet=false;;
 		(-q|--quiet) opt_quiet=true;;
-		(--master) opt_ssh_use_master=true;;
-		(--no-master) opt_ssh_use_master=false;;
+		(-M|--master) opt_ssh_use_master=true;;
+		(--no-M|--no-master) opt_ssh_use_master=false;;
 		(-i|--interactive) opt_ssh_interactive=true;;
 		(--allow-invalid-host) allow_invalid_host=true;;
-		(--no-bootstrap) BOOTSTRAP='';;
 		(--) shift;break;;
 		(for)
 			case "$2" in
