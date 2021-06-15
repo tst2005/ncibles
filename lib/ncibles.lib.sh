@@ -19,18 +19,27 @@ ncibles_help() {
 	local zero___="$(basename "$0")"
 	echo 'Usage: '"$0"' [<option>] for <hostname>|@<groupname> [unecible ... \;] [exec|ssh ... {} ... \;]'
 	echo 'Options:'
-	echo '   --master                      -- use ssh ControlMaster feature (use by default for '"$zero__"')'
-	echo '   --no-master                   -- disable --master'
 	echo '   --allow-invalid-host          -- do not check host'
+	echo '   --master                      -- [ssh] use ssh ControlMaster feature (use by default for '"$zero__"')'
+	echo '   --no-master                   -- [ssh] disable --master'
+	echo '   -i|--interactive              -- [ssh] This option allow interactive password to be asked'
 	echo '   -q|--quiet                    -- do not show name for each target'
-	echo 'Select targets:'
+	echo '   -v|--verbose                  -- opposit of --quiet (default: --verbose)'
+	echo
+	echo 'Targets selection:'
 	echo '   for  <hostname>               -- add one target'
 	echo '   for @<groupname>              -- add a group of targets (see etc/groups/NAME.hosts)'
+	echo
 	echo 'Actions:'
-	echo '   unecible ... \;               -- shortcut for: exec uncible {} ... \;'
-	echo '   exec command ... {} ... \;    -- execute command ... $target ... like a find -exec syntax'
-	echo '   exec foo --bar {} \;          -- execute the command: foo --bar $target'
-	echo '   ssh ... {} ... \;             -- shortcut for: exec via__ssh ... {} ... \;'
+	echo '   exec ... {} ... \;              -- execute the argument like the find -exec syntax'
+	echo '   ssh ... {} ... \;               -- equals: exec via__ssh ... {} ... \;'
+	echo '   unecible ... \;                 -- equals: exec unecible {} ... \; (Note: the target is added as first argument)'
+	echo
+	echo 'Sample:'
+	echo '   ncibles for ... exec echo ". {}" \;'
+	echo '   ncibles for ... ssh -n root@{} "id -a;uptime" \;'
+	echo '   ncibles for ... unecible ./tasks/uptime.sh \;'
+	echo '   ncibles for ... unecible ./tasks/checkaccount.sh email@example.net \;'
 }
 
 ncibles_groupname_list() {
