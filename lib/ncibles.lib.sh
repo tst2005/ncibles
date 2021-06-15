@@ -1,5 +1,5 @@
 
-REQUIRE unecible
+#REQUIRE unecible
 
 # usefull to check valid/invalid hostname
 REQUIRE via__ssh__hostname_with_ssh_options
@@ -62,13 +62,15 @@ ncibles_exec1() {
 	# search where is the next ';' argument
 	local n=$((1+$#-$( while [ $# -gt 0 ] && [ "$1" != ';' ]; do shift; done; echo $# ) ))
 	if [ $n -gt $# ]; then
-		echo "Syntax error: argument ';' not found"
+		echo >&2 "ERROR: ncibles: exec syntax: missing \\; argument in the command line"
 		return 1
 	fi
 	(
-		lskip=1 # remove the first argument ("exec")
+		lskip=0 # remove the first argument ("exec")
 		rskip=1 # remove the last argument (";")
-		eval "set --$(printf \ \"\$%s\" @ $(seq $((1+$lskip)) $(($n-$rskip))));shift \$(( \$# -$n +$rskip +$lskip))"
+		start=$((1+$lskip))
+		stop=$(($n-$rskip))
+		eval "set --$(printf \ \"\$%s\" @ $(seq $start $stop));shift \$(( \$# -$n +$rskip +$lskip))"
 		eval "$(posix_replace_in_all_args__code "{}" "$target")"
 		"$@"
 	)
@@ -78,9 +80,10 @@ ncibles_exec1() {
 
 ncibles() {
 	local TARGETS=''
-	BOOTSTRAP='remote.stdin/bootstrap'
+	local BOOTSTRAP='remote.stdin/bootstrap'
 	local allow_invalid_host=false
-	local opt_use_master=true
+	local opt_ssh_use_master=true
+	local opt_ssh_interactive=false
 	local opt_quiet=false
 	[ $# -ne 0 ] || set -- --help
 	while [ $# -gt 0 ]; do
@@ -91,8 +94,9 @@ ncibles() {
 		;;
 		(-v|--verbose) opt_quiet=false;;
 		(-q|--quiet) opt_quiet=true;;
-		(--master) opt_use_master=true;;
-		(--no-master) opt_use_master=false;;
+		(--master) opt_ssh_use_master=true;;
+		(--no-master) opt_ssh_use_master=false;;
+		(-i|--interactive) opt_ssh_interactive=true;;
 		(--allow-invalid-host) allow_invalid_host=true;;
 		(--no-bootstrap) BOOTSTRAP='';;
 		(--) shift;break;;
@@ -126,8 +130,11 @@ ncibles() {
 		shift
 	done
 
-	if [ -z "$UNECIBLE_USE_MASTER" ] && [ -n "$opt_use_master" ]; then
-		UNECIBLE_USE_MASTER="$opt_use_master"
+	if [ -z "$VIA_SSH_USE_MASTER" ] && [ -n "$opt_ssh_use_master" ]; then
+		VIA_SSH_USE_MASTER="$opt_ssh_use_master"
+	fi
+	if [ -z "$VIA_SSH_INTERACTIVE" ] && [ -n "$opt_ssh_interactive" ]; then
+		VIA_SSH_INTERACTIVE="$opt_ssh_interactive"
 	fi
 
 #### manage targets ####
@@ -169,11 +176,12 @@ ncibles() {
 #### run actions ####
 
 	while read -r target _; do
-		${opt_quiet:-false} || echo >&2 "# --- before $target"
+		${opt_quiet:-false} || echo >&2 "# ---  $target  --- #"
 		(
 		while [ $# -gt 0 ]; do
 			case "$1" in
 			(unecible) shift;
+				REQUIRE unecible
 				set -- exec unecible "{}" "$@"
 				continue
 			;;
@@ -182,8 +190,7 @@ ncibles() {
 				set -- exec via__ssh "$target" -n "$@"
 				continue
 			;;
-			(exec)
-				#shift
+			(exec) shift;
 #FIXME: shift + lshift=0 ? we only need rshift=1
 				#(
 				exec 3<> "$tmp2"
@@ -197,7 +204,7 @@ ncibles() {
 			esac
 		done
 		)
-		${opt_quiet:-false} || echo >&2 "# --- after $target"
+		${opt_quiet:-false} || echo >&2 "# --- /$target  --- #"
 		${opt_quiet:-false} || echo
 	done < "$tmp"
 }

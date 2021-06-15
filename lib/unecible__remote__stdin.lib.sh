@@ -19,7 +19,7 @@ unecible__remote__stdin() {
 	{
 		echo "echo '# START $uid'"
 		capturecode
-		for m in $BOOTSTRAP "$@"; do
+		for m in $unecible_remote_bootstrap "$@"; do
 			local f="$m"
 			modules__resolv
 			if [ -f "$f" ]; then
