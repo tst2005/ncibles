@@ -58,7 +58,7 @@ posix_replace() {
 	printf %s "$data" | sed -e 's,'"$from"','"$to"',g'
 }
 
-posix_replace_in_all_args__code() {
+posix_replace_foreach_args__code() {
 	echo 'for a in "$@"; do set -- "$@" "$(posix_replace "'"$1"'" "'"$2"'" "$a")";shift;done'
 }
 
@@ -78,7 +78,7 @@ ncibles_exec1() {
 		start=$((1+$lskip))
 		stop=$(($n-$rskip))
 		eval "set --$(printf \ \"\$%s\" @ $(seq $start $stop));shift \$(( \$# -$n +$rskip +$lskip))"
-		eval "$(posix_replace_in_all_args__code "{}" "$target")"
+		eval "$(posix_replace_foreach_args__code "{}" "$target")"
 		"$@"
 	)
 	# return the $n to the parent
@@ -180,6 +180,14 @@ ncibles() {
 
 #### run actions ####
 
+	if [ $# -gt 0 ]; then
+		local v
+		eval 'v="$'"$#"'"'
+		if [ "$v" != \; ];  then
+			set -- "$@" \;
+		fi
+	fi
+
 	while read -r target _; do
 		${opt_quiet:-false} || echo >&2 "# ---  $target  --- #"
 		(
@@ -196,7 +204,6 @@ ncibles() {
 				continue
 			;;
 			(exec) shift;
-#FIXME: shift + lshift=0 ? we only need rshift=1
 				#(
 				exec 3<> "$tmp2"
 				ncibles_exec1 "$@"
