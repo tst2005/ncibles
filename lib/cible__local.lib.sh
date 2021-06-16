@@ -1,7 +1,7 @@
 
 REQUIRE modules__resolv
 
-unecible__local() {
+cible__local() {
 	local target="$1";shift
 	local module="$1";shift
 	local method="$1";shift

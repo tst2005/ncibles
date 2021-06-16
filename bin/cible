@@ -7,6 +7,6 @@ cd -- "$STARTPWD" || exit 1
 
 . "$BASEDIR/lib/core.lib.sh"
 
-REQUIRE unecible
+REQUIRE cible
 
-unecible "$@"
+cible "$@"

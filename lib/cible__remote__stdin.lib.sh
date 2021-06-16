@@ -1,5 +1,5 @@
 REQUIRE via__ssh
-unecible_ssh() { via__ssh "$@"; }
+ALIAS via__ssh as cible_ssh # name also used by modules
 
 REQUIRE misc__newuid
 newuid() { misc__newuid "$@"; }
@@ -7,19 +7,19 @@ newuid() { misc__newuid "$@"; }
 REQUIRE capture__capturecode
 capturecode() { capture__capturecode "$@"; }
 
-REQUIRE unecible__remote__conncheck
+REQUIRE cible__remote__conncheck
 
 REQUIRE modules__resolv
 
-unecible__remote__stdin() {
+cible__remote__stdin() {
 	local target="$1";shift
-	unecible__remote__conncheck "$target"
+	cible__remote__conncheck "$target"
 
 	local uid="$(newuid)"
 	{
 		echo "echo '# START $uid'"
 		capturecode
-		for m in $unecible_remote_bootstrap "$@"; do
+		for m in $cible_remote_bootstrap "$@"; do
 			local f="$m"
 			modules__resolv
 			if [ -f "$f" ]; then
@@ -37,7 +37,7 @@ unecible__remote__stdin() {
 	tee "$BASEDIR/run/$target/tmp.sh" | {
 		local remotecode='set -e;t="$(mktemp -d)";trap "rm -rf -- \"$t\"" EXIT;cd -- "$t";cat ->tmp.sh;sh tmp.sh;'
 		set -- ${UNECIBLE_SSH_OPTIONS}
-		unecible_ssh "$target" "$@" "$remotecode"
+		cible_ssh "$target" "$@" "$remotecode"
 	} >> "$BASEDIR/run/$target/log"
 }
 

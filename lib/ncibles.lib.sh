@@ -15,7 +15,7 @@ validhost() {
 
 ncibles_help() {
 	local zero___="$(basename "$0")"
-	echo 'Usage: '"$0"' [<option>] for <hostname>|@<groupname> [unecible ... \;] [exec|ssh ... {} ... \;]'
+	echo 'Usage: '"$0"' [<option>] for <hostname>|@<groupname> [cible ... \;] [exec|ssh ... {} ... \;]'
 	echo 'Options:'
 	echo '   --allow-invalid-host          -- do not check host'
 	echo '   --master                      -- [ssh] use ssh ControlMaster feature (use by default for '"$zero__"')'
@@ -31,13 +31,13 @@ ncibles_help() {
 	echo 'Actions:'
 	echo '   exec ... {} ... \;              -- execute the argument like the find -exec syntax'
 	echo '   ssh ... {} ... \;               -- equals: exec via__ssh ... {} ... \;'
-	echo '   unecible ... \;                 -- equals: exec unecible {} ... \; (Note: the target is added as first argument)'
+	echo '   cible ... \;                    -- equals: exec cible {} ... \; (Note: the target is added as first argument)'
 	echo
 	echo 'Sample:'
 	echo '   ncibles for ... exec echo ". {}" \;'
 	echo '   ncibles for ... ssh -n root@{} "id -a;uptime" \;'
-	echo '   ncibles for ... unecible ./tasks/uptime.sh \;'
-	echo '   ncibles for ... unecible ./tasks/checkaccount.sh email@example.net \;'
+	echo '   ncibles for ... cible ./tasks/uptime.sh \;'
+	echo '   ncibles for ... cible ./tasks/checkaccount.sh email@example.net \;'
 }
 
 ncibles_groupname_list() {
@@ -185,9 +185,9 @@ ncibles() {
 		(
 		while [ $# -gt 0 ]; do
 			case "$1" in
-			(unecible) shift;
-				REQUIRE unecible
-				set -- exec unecible "{}" "$@"
+			(cible) shift;
+				REQUIRE cible
+				set -- exec cible "{}" "$@"
 				continue
 			;;
 			(ssh) shift;
