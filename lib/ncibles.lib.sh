@@ -208,7 +208,7 @@ ncibles() {
 				local n=$(cat -- "$tmp2")
 				shift $n
 			;;
-			(*) echo >&2 "ERROR"; return 1;;
+			(*) echo >&2 "ncibles: ERROR: Invalid command. Expected cible|ssh|exec, got $1"; return 1;;
 			esac
 		done
 		)
