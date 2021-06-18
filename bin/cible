@@ -9,4 +9,6 @@ cd -- "$STARTPWD" || exit 1
 
 REQUIRE cible
 
+uplevel_ssh_use_master=''
+uplevel_ssh_interactive=''
 cible "$@"

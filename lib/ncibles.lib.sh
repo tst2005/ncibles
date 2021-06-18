@@ -29,9 +29,11 @@ ncibles_help() {
 	echo '   for @<groupname>              -- add a group of targets (see etc/groups/NAME.hosts)'
 	echo
 	echo 'Actions:'
-	echo '   exec ... {} ... \;              -- execute the argument like the find -exec syntax'
-	echo '   ssh ... {} ... \;               -- equals: exec via__ssh ... {} ... \;'
-	echo '   cible ... \;                    -- equals: exec cible {} ... \; (Note: the target is added as first argument)'
+	echo '   exec ... {} ... \;            -- execute the argument like the find -exec syntax'
+	echo 'Alias: (Note: the target is added as first cible argument)'
+	echo '   cible                          <-> exec cible {}'
+	echo '   ssh        <-> cible ssh       <-> exec cible {} ssh'
+	echo '   sshcheck   <-> cible sshcheck  <-> exec cible {} sshcheck'
 	echo
 	echo 'Sample:'
 	echo '   ncibles for ... exec echo ". {}" \;'
@@ -196,10 +198,13 @@ ncibles() {
 				set -- exec cible "{}" "$@"
 				continue
 			;;
-			(ssh) shift
-				REQUIRE via__ssh;
-				set -- exec via__ssh "$target" -n "$@"
+			(ssh|sshcheck)
+				set -- cible "$@"
 				continue
+
+#				REQUIRE via__ssh;
+#				shift;set -- exec via__ssh "$target" -n "$@"
+#				continue
 			;;
 			(exec) shift
 				exec 3<> "$tmp2"

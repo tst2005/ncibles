@@ -24,7 +24,7 @@ cible__remote__stdin() {
 			modules__resolv
 			if [ -f "$f" ]; then
 				echo "echo '# $m'"
-				echo 'UNECIBLE_MODULE="'"$m"'"'
+				echo 'CIBLE_MODULE="'"$m"'"'
 				cat "$f"
 				echo "echo '# /$m'"
 			else
@@ -36,7 +36,7 @@ cible__remote__stdin() {
 	} |
 	tee "$BASEDIR/run/$target/tmp.sh" | {
 		local remotecode='set -e;t="$(mktemp -d)";trap "rm -rf -- \"$t\"" EXIT;cd -- "$t";cat ->tmp.sh;sh tmp.sh;'
-		set -- ${UNECIBLE_SSH_OPTIONS}
+		set -- ${CIBLE_SSH_OPTIONS}
 		cible_ssh "$target" "$@" "$remotecode"
 	} >> "$BASEDIR/run/$target/log"
 }
