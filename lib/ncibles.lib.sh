@@ -65,7 +65,8 @@ posix_replace_foreach_args__code() {
 #set -- a b "A {}/Z/{}/" c d
 #eval "$(posix_replace_in_all_args__code "{}" "$target")"
 
-ncibles_exec1() {
+ncibles_exec() {
+
 	# search where is the next ';' argument
 	local n=$((1+$#-$( while [ $# -gt 0 ] && [ "$1" != ';' ]; do shift; done; echo $# ) ))
 	if [ $n -gt $# ]; then
@@ -73,11 +74,8 @@ ncibles_exec1() {
 		return 1
 	fi
 	(
-		lskip=0 # remove the first argument ("exec")
 		rskip=1 # remove the last argument (";")
-		start=$((1+$lskip))
-		stop=$(($n-$rskip))
-		eval "set --$(printf \ \"\$%s\" @ $(seq $start $stop));shift \$(( \$# -$n +$rskip +$lskip))"
+		eval "set --$(printf \ \"\${%s}\" $(seq 1 $(($n-$rskip)) ))"
 		eval "$(posix_replace_foreach_args__code "{}" "$target")"
 		"$@"
 	)
@@ -182,7 +180,7 @@ ncibles() {
 
 	if [ $# -gt 0 ]; then
 		local v
-		eval 'v="$'"$#"'"'
+		eval 'v="${'"$#"'}"'
 		if [ "$v" != \; ];  then
 			set -- "$@" \;
 		fi
@@ -193,22 +191,20 @@ ncibles() {
 		(
 		while [ $# -gt 0 ]; do
 			case "$1" in
-			(cible) shift;
+			(cible) shift
 				REQUIRE cible
 				set -- exec cible "{}" "$@"
 				continue
 			;;
-			(ssh) shift;
+			(ssh) shift
 				REQUIRE via__ssh;
 				set -- exec via__ssh "$target" -n "$@"
 				continue
 			;;
-			(exec) shift;
-				#(
+			(exec) shift
 				exec 3<> "$tmp2"
-				ncibles_exec1 "$@"
+				ncibles_exec "$@"
 				exec 3>&-
-				#)
 				local n=$(cat -- "$tmp2")
 				shift $n
 			;;
