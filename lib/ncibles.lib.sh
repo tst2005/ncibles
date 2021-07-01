@@ -183,7 +183,7 @@ ncibles() {
 	if [ $# -gt 0 ]; then
 		local v
 		eval 'v="${'"$#"'}"'
-		if [ "$v" != \; ];  then
+		if [ "$v" != \; ]; then
 			set -- "$@" \;
 		fi
 	fi
@@ -201,10 +201,6 @@ ncibles() {
 			(ssh|sshcheck)
 				set -- cible "$@"
 				continue
-
-#				REQUIRE via__ssh;
-#				shift;set -- exec via__ssh "$target" -n "$@"
-#				continue
 			;;
 			(exec) shift
 				exec 3<> "$tmp2"
