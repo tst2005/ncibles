@@ -35,7 +35,7 @@ cible__remote__stdin() {
 		echo "echo '# STOP $uid'"
 	} |
 	tee "$BASEDIR/run/$target/tmp.sh" | {
-		local remotecode='set -e;t="$(mktemp -d)";trap "rm -rf -- \"$t\"" EXIT;cd -- "$t";cat ->tmp.sh;sh tmp.sh;'
+		local remotecode='set -e;t="$(mktemp -d "${TMPDIR:-/tmp}/${TEMPLATE:-tmp.XXXXXXXXXX}")";trap "rm -rf -- \"$t\"" EXIT;cd -- "$t";cat ->tmp.sh;sh tmp.sh;'
 		set -- ${CIBLE_SSH_OPTIONS}
 		cible_ssh "$target" "$@" "$remotecode"
 	} >> "$BASEDIR/run/$target/log"
