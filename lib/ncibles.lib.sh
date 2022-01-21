@@ -44,7 +44,7 @@ ncibles_help() {
 
 ncibles_groupname_list() {
 	(
-		cd "$BASEDIR/etc/groups/" &&
+		cd "${NCIBLES_ETCDIR:-./etc}/groups/" &&
 		for g in *".hosts"; do
 			echo "@${g%.*}"
 		done
@@ -113,7 +113,7 @@ ncibles() {
 				return 1
 			;;
 			(@*)	## Add a group host
-				local f="$BASEDIR/etc/groups/${2#@}.hosts"
+				local f="${NCIBLES_ETCDIR:-./etc}/groups/${2#@}.hosts"
 				if [ ! -f "$f" ]; then
 					msgerror "No such group $2 ($f)"
 					return 1
@@ -155,7 +155,7 @@ ncibles() {
 	for t in $TARGETS; do
 		case "$t" in
 		(@*)
-			local f="$BASEDIR/etc/groups/${t#@}.hosts"
+			local f="${NCIBLES_ETCDIR:-./etc}/groups/${t#@}.hosts"
 			if [ ! -f "$f" ]; then
 				echo >&2 "No such group named ${t#@}"
 				return 1
