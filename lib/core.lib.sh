@@ -1,4 +1,8 @@
 REQUIRE() {
+	if [ -z "$NCIBLES_LIBDIR" ]; then
+		echo >&2 "ERROR: NCIBLES_LIBDIR must be defined"
+		return 1
+	fi
 	#### init
 	# consider this module (named "core") as loaded
 	[ -n "$NCIBLES_LOADED" ] || NCIBLES_LOADED=core
@@ -13,7 +17,7 @@ REQUIRE() {
 		#### LOAD ####
 		NCIBLES_LOADED="$NCIBLES_LOADED"$'\n'"$1"
 		loadlevel=$((${loadlevel:-0}+1))
-		. "$BASEDIR/lib/$1.lib.sh"
+		. "$NCIBLES_LIBDIR/$1.lib.sh"
 		loadlevel=$(($loadlevel-1))
 		#### /LOAD ####
 
