@@ -17,6 +17,10 @@ REQUIRE() {
 		#### LOAD ####
 		NCIBLES_LOADED="$NCIBLES_LOADED"$'\n'"$1"
 		loadlevel=$((${loadlevel:-0}+1))
+		if [ ! -r "$NCIBLES_LIBDIR/$1.lib.sh" ]; then
+			echo >&2 "ERROR: $1 not available"
+			return 1
+		fi
 		. "$NCIBLES_LIBDIR/$1.lib.sh"
 		loadlevel=$(($loadlevel-1))
 		#### /LOAD ####
