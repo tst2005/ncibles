@@ -47,6 +47,7 @@ cible_help() {
 	echo '       cible <target> [options] eval                [<args...>]'
 	echo 'Options:'
 	echo '   -p <text>|--prefix <text>'
+	echo '   -F <text>|--format <text>'
         echo '   -M|--master                   -- [ssh] use ssh ControlMaster feature (enabled by default)'
         echo '   --no-master                   -- [ssh] disable --master'
         echo '   -i|--interactive              -- [ssh] This option allow interactive password to be asked'
@@ -61,7 +62,7 @@ cible() {
 	(-*) cible_help >&2; return 1 ;;
 	esac
 	local cible_verbose=false
-	local cible_use_prefix=''
+	local cible_use_prefix='' cible_use_format=''
 	local cible_remote_bootstrap='remote.stdin/bootstrap'
         local cible_ssh_use_master=${uplevel_ssh_use_master:-true}
         local cible_ssh_interactive=${uplevel_ssh_interactive:-false}
@@ -77,6 +78,7 @@ cible() {
 		(-M|--master)		cible_ssh_use_master=true;;
 		(--no-M|--no-master)	cible_ssh_use_master=false;;
 		(-i|--interactive)	cible_ssh_interactive=true;;
+		(-F|--format)		cible_use_format="$2";shift;;
 		(-p|--prefix)		cible_use_prefix="$2";shift;;
 		(--no-bootstrap)	cible_remote_bootstrap='';;
 		(--) shift;break;;
@@ -93,12 +95,12 @@ cible() {
 		VIA_SSH_INTERACTIVE="$cible_ssh_interactive"
 	fi
 
-	if [ -z "$cible_use_prefix" ]; then
+	if [ -z "$cible_use_prefix" ] && [ -z "$cible_use_format" ]; then
 		target="$target" _cible "$@"
 	else
 		target="$target" _cible "$@" |
 		while read -r line; do
-			printf %s%s\\n "$cible_use_prefix" "$line"
+			printf "${cible_use_format:-%s}"\\n "$(printf %s%s "$cible_use_prefix" "$line")"
 		done
 	fi
 }
