@@ -26,16 +26,16 @@ capture__parse_log_to_json() {
 		if ${valueopen:-false}; then
 			if [ -z "$line" ]; then
 				case "$value" in
-				('b8:'*)  value="$(echo "${value#*:}" | base8decode )" ;;
-				('b16:'*) value="$(echo "${value#*:}" | base16decode)" ;;
-				('b64:'*) value="$(echo "${value#*:}" | base64decode)" ;;
-				esac
-				jq -cM -n \
+				('b8:'*)  echo "${value#*:}" | base8decode ;;
+				('b16:'*) echo "${value#*:}" | base16decode ;;
+				('b64:'*) echo "${value#*:}" | base64decode ;;
+				(*)       echo >&2 "ERROR: unknown format (expected: b8|b16|b64)"; exit 1 ;;
+				esac |
+				jq -cMRs \
 					--arg t "$target" \
 					--arg m "$module" \
 					--arg k "$key"    \
-					--arg v "$value"  \
-					'{ "target":($t), "module":($m), "key":($k), "value":($v) }'
+					'{ "target":($t), "module":($m), "key":($k), "value":(.) }'
 				valueopen=false module='' key='' value=''
 			else
 				value="$value$line"		
