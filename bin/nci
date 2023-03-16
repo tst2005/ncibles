@@ -5,9 +5,9 @@ cd -- "$(dirname "$(readlink -f "$0")")/.." || exit 1
 BASEDIR="$(pwd)"
 cd -- "$STARTPWD" || exit 1
 
-NCIBLES_LIBDIR="$BASEDIR/lib"
+NCI_LIBDIR="$BASEDIR/lib"
 . "$BASEDIR/lib/core.lib.sh"
 
-REQUIRE ncibles
+REQUIRE nci
 
-ncibles "$@"
+nci "$@"

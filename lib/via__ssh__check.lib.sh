@@ -7,7 +7,7 @@ via__ssh__check() {
 	local target="$1";shift
 	local uid="$(newuid)"
 	if [ "$(
-		via__ssh "$target" -n ${CIBLE_SSH_OPTIONS} "echo $uid"
+		via__ssh "$target" -n ${CI_SSH_OPTIONS} "echo $uid"
 	)" = "$uid" ]; then
 		echo >&2 "ok: sshcheck $target"
 	else

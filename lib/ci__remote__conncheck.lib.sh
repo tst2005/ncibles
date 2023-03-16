@@ -3,12 +3,12 @@ REQUIRE via__ssh
 REQUIRE misc__newuid
 newuid() { misc__newuid "$@"; }
 
-cible__remote__conncheck() {
+ci__remote__conncheck() {
 	local target="$1";shift
 	[ -d "$BASEDIR/run/$target" ] || mkdir -- "$BASEDIR/run/$target"
 	local uid="$(newuid)"
 	if [ "$(
-		via__ssh "$target" -n ${CIBLE_SSH_OPTIONS} "echo $uid"
+		via__ssh "$target" -n ${CI_SSH_OPTIONS} "echo $uid"
 	)" = "$uid" ]; then
 		echo >&2 "ok: sshcheck $target"
 		echo "ok: sshcheck $target" >>  "$BASEDIR/run/$target/log"

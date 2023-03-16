@@ -1,7 +1,7 @@
 capture__capturecode() {
 	echo 'CAPTURE() {'
 	echo ' [ "$1" != "as" ] || shift;'
-	echo ' echo "MODULE ${CIBLE_MODULE:-MISSING_MODULE_NAME} KEY $1";'
+	echo ' echo "MODULE ${CI_MODULE:-MISSING_MODULE_NAME} KEY $1";'
 	echo ' if command -v base64 >/dev/null 2>&1; then'
 	echo '  echo "b64:";'
 	echo '  base64;'

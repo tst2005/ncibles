@@ -13,9 +13,9 @@ validhost() {
 }
 
 
-ncibles_help() {
+nci_help() {
 	local zero___="$(basename "$0")"
-	echo 'Usage: '"$0"' [<option>] for <hostname>|@<groupname> [cible ... \;] [exec|ssh ... {} ... \;]'
+	echo 'Usage: '"$0"' [<option>] for <hostname>|@<groupname> [ci ... \;] [exec|ssh ... {} ... \;]'
 	echo 'Options:'
 	echo '   --allow-invalid-host          -- do not check host'
 	echo '   --master                      -- [ssh] use ssh ControlMaster feature (use by default for '"$zero__"')'
@@ -30,21 +30,21 @@ ncibles_help() {
 	echo
 	echo 'Actions:'
 	echo '   exec ... {} ... \;            -- execute the argument like the find -exec syntax'
-	echo 'Alias: (Note: the target is added as first cible argument)'
-	echo '   cible                          <-> exec cible {}'
-	echo '   ssh        <-> cible ssh       <-> exec cible {} ssh'
-	echo '   sshcheck   <-> cible sshcheck  <-> exec cible {} sshcheck'
+	echo 'Alias: (Note: the target is added as first ci argument)'
+	echo '   ci                          <-> exec ci {}'
+	echo '   ssh        <-> ci ssh       <-> exec ci {} ssh'
+	echo '   sshcheck   <-> ci sshcheck  <-> exec ci {} sshcheck'
 	echo
 	echo 'Sample:'
-	echo '   ncibles for ... exec echo ". {}" \;'
-	echo '   ncibles for ... ssh -n root@{} "id -a;uptime" \;'
-	echo '   ncibles for ... cible ./tasks/uptime.sh \;'
-	echo '   ncibles for ... cible ./tasks/checkaccount.sh email@example.net \;'
+	echo '   nci for ... exec echo ". {}" \;'
+	echo '   nci for ... ssh -n root@{} "id -a;uptime" \;'
+	echo '   nci for ... ci ./tasks/uptime.sh \;'
+	echo '   nci for ... ci ./tasks/checkaccount.sh email@example.net \;'
 }
 
-ncibles_groupname_list() {
+nci_groupname_list() {
 	(
-		cd "${NCIBLES_ETCDIR:-./etc}/groups/" &&
+		cd "${NCI_ETCDIR:-./etc}/groups/" &&
 		for g in *".hosts"; do
 			echo "@${g%.*}"
 		done
@@ -67,12 +67,12 @@ posix_replace_foreach_args__code() {
 #set -- a b "A {}/Z/{}/" c d
 #eval "$(posix_replace_in_all_args__code "{}" "$target")"
 
-ncibles_exec() {
+nci_exec() {
 
 	# search where is the next ';' argument
 	local n=$((1+$#-$( while [ $# -gt 0 ] && [ "$1" != ';' ]; do shift; done; echo $# ) ))
 	if [ $n -gt $# ]; then
-		echo >&2 "ERROR: ncibles: exec syntax: missing \\; argument in the command line"
+		echo >&2 "ERROR: nci: exec syntax: missing \\; argument in the command line"
 		return 1
 	fi
 	(
@@ -85,7 +85,7 @@ ncibles_exec() {
 	echo $n >&3
 }
 
-ncibles() {
+nci() {
 	local TARGETS=''
 	local allow_invalid_host=false
 	local opt_ssh_use_master=true
@@ -95,7 +95,7 @@ ncibles() {
 	while [ $# -gt 0 ]; do
 		case "$1" in
 		(-h|--help|help)
-			ncibles_help >&2
+			nci_help >&2
 			return 0
 		;;
 		(-v|--verbose) opt_quiet=false;;
@@ -109,11 +109,11 @@ ncibles() {
 			case "$2" in
 			## Show group completion list
 			(""|@)
-				ncibles_groupname_list ' - ' >&2;
+				nci_groupname_list ' - ' >&2;
 				return 1
 			;;
 			(@*)	## Add a group host
-				local f="${NCIBLES_ETCDIR:-./etc}/groups/${2#@}.hosts"
+				local f="${NCI_ETCDIR:-./etc}/groups/${2#@}.hosts"
 				if [ ! -f "$f" ]; then
 					msgerror "No such group $2 ($f)"
 					return 1
@@ -155,7 +155,7 @@ ncibles() {
 	for t in $TARGETS; do
 		case "$t" in
 		(@*)
-			local f="${NCIBLES_ETCDIR:-./etc}/groups/${t#@}.hosts"
+			local f="${NCI_ETCDIR:-./etc}/groups/${t#@}.hosts"
 			if [ ! -f "$f" ]; then
 				echo >&2 "No such group named ${t#@}"
 				return 1
@@ -193,23 +193,23 @@ ncibles() {
 		(
 		while [ $# -gt 0 ]; do
 			case "$1" in
-			(cible) shift
-				REQUIRE cible
-				set -- exec cible "{}" "$@"
+			(ci) shift
+				REQUIRE ci
+				set -- exec ci "{}" "$@"
 				continue
 			;;
 			(ssh|sshcheck)
-				set -- cible "$@"
+				set -- ci "$@"
 				continue
 			;;
 			(exec) shift
 				exec 3<> "$tmp2"
-				ncibles_exec "$@"
+				nci_exec "$@"
 				exec 3>&-
 				local n=$(cat -- "$tmp2")
 				shift $n
 			;;
-			(*) echo >&2 "ncibles: ERROR: Invalid command. Expected cible|ssh|exec, got $1"; return 1;;
+			(*) echo >&2 "nci: ERROR: Invalid command. Expected ci|ssh|exec, got $1"; return 1;;
 			esac
 		done
 		)

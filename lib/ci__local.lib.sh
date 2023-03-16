@@ -1,7 +1,7 @@
 
 REQUIRE modules__resolv
 
-cible__local() {
+ci__local() {
 	local target="$1";shift
 	local module="$1";shift
 	local method="$1";shift
